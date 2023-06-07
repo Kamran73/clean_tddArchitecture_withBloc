@@ -1,110 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:provider_state_management/controllers/count_controller/count_controller.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider_state_management/features/number_trivia/presentation/bloc/number_trivia_bloc.dart';
+import 'features/number_trivia/presentation/pages/number_trivia_page.dart';
+import 'injection_container.dart' as di;
+import 'injection_container.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await di.init();
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) {
-        return CountController();
-      },
-      child: const MaterialApp(
-        home: Stateless(),
-      ),
-    );
-  }
-}
-
-class CountApp extends StatefulWidget {
-  const CountApp({Key? key}) : super(key: key);
-
-  @override
-  State<CountApp> createState() => _CountAppState();
-}
-
-class _CountAppState extends State<CountApp> {
-  @override
-  Widget build(BuildContext context) {
-    debugPrint('build');
-    CountController controller =
-        Provider.of<CountController>(context, listen: false);
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          controller.updateValue();
-        },
-        child: const Icon(Icons.add),
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Consumer<CountController>(
-            builder: (context, value, child) {
-              return Text('${controller.getCount}');
-            },
-          ),
-          Consumer<CountController>(
-            builder: (context, value, child) {
-              return Expanded(
-                child: ListView.builder(
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      leading: IconButton(
-                        onPressed: () {
-                          value.removeAt(index: index);
-                        },
-                        icon: const Icon(Icons.cancel_outlined),
-                        color: Colors.blueAccent,
-                      ),
-                      title: Text(
-                        value.getList[index].toString(),
-                        style: const TextStyle(fontSize: 20),
-                      ),
-                    );
-                  },
-                  itemCount: value.getList.length,
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class Stateless extends StatelessWidget {
-  const Stateless({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    debugPrint('build');
-    ValueNotifier<int> count = ValueNotifier<int>(0);
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          count.value++;
-          debugPrint(count.value.toString());
-        },
-      ),
-      body: Center(
-        child: ValueListenableBuilder(
-          builder: (context, value, child) {
-            return Text(
-              count.value.toString(),
-              style: const TextStyle(fontSize: 20),
-            );
-          }, valueListenable: count,
+    return BlocProvider<NumberTriviaBloc>(
+      create: (_) => sl(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Number Trivia',
+        theme: ThemeData(
+          primaryColor: Colors.green.shade800,
         ),
+        home: const NumberTriviaPage(),
       ),
     );
   }
 }
+
